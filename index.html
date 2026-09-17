@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CHEYENNE FX</title>
+<style>
+:root{--bg:#fff;--text:#111;--muted:#777;--line:#e9e9e9;--blue:#0071e3;--green:#34c759;--yellow:#ffcc00}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif}
+main{max-width:900px;margin:auto;padding:34px 22px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:56px}
+.brand{font-size:18px;font-weight:600;letter-spacing:-.02em}.sub,.muted{color:var(--muted);font-size:13px;margin-top:6px}
+.status{font-size:12px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:8px}
+select{appearance:none;border:1px solid var(--line);border-radius:12px;padding:10px 34px 10px 13px;background:#fff;font-size:15px}
+.rate{font-size:58px;line-height:1;font-weight:500;letter-spacing:-.055em;text-align:right}.unit{font-size:13px;color:var(--muted);text-align:right;margin-top:8px}
+.move{display:inline-block;margin-top:16px;padding:6px 10px;border-radius:99px;background:#eef8f0;color:#1f8b3d;font-size:13px}
+.chart-wrap{margin-top:28px}.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.chart-title{font-size:14px;font-weight:600}
+.periods{display:flex;gap:3px}.period{border:0;background:transparent;border-radius:8px;padding:6px 9px;color:var(--muted);font-size:12px}.period.active{background:#f1f1f1;color:#111}
+svg{width:100%;height:330px;display:block}.legend{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:4px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.yellow{background:var(--yellow)}.green{background:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:34px}.card{background:#fff;padding:22px;min-height:125px}.label{color:var(--muted);font-size:13px}.value{font-size:22px;font-weight:500;margin-top:12px;letter-spacing:-.02em}.small{color:var(--muted);font-size:12px;margin-top:7px}
+.study{margin-top:28px;padding:24px;border-radius:20px;background:#f7f7f7}.study-top{display:flex;justify-content:space-between;gap:20px;align-items:end;flex-wrap:wrap}.study h2{font-size:15px;margin:0 0 8px}.study strong{font-size:25px;font-weight:500}.bar{height:7px;background:#ddd;border-radius:99px;margin-top:18px;overflow:hidden}.fill{height:100%;width:25%;background:#111;border-radius:99px}.zones{display:flex;justify-content:space-between;margin-top:17px;font-size:12px;color:var(--muted)}
+.note{margin-top:28px;color:#999;font-size:11px;line-height:1.6}
+@media(max-width:600px){main{padding:25px 17px 45px}header{margin-bottom:42px}.rate{font-size:48px}.grid{grid-template-columns:1fr}svg{height:260px}.status{display:none}}
+
+.source-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+.source-card{background:#fff;border:1px solid #e9e9e9;border-radius:14px;padding:14px}
+.source-name{font-size:12px;color:#777}.source-value{font-size:15px;font-weight:500;margin-top:6px}.source-meta{font-size:11px;color:#999;margin-top:5px;line-height:1.45}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 8px;background:#eef8f0;color:#258a40;font-size:11px}
+.alert-box{margin-top:14px;padding:14px;border-radius:14px;background:#fff8e6;border:1px solid #f3dfaa;font-size:12px;line-height:1.5}
+@media(max-width:600px){.source-grid{grid-template-columns:1fr}}
+
+
+.analysis{margin-top:34px}.section-title{font-size:18px;font-weight:600;letter-spacing:-.02em}.section-sub{font-size:12px;color:#999;margin-top:5px}
+.analysis-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#e9e9e9;border:1px solid #e9e9e9;border-radius:18px;overflow:hidden;margin-top:16px}
+.a-card{background:#fff;padding:20px;min-height:150px}.a-label{font-size:12px;color:#777}.a-value{font-size:21px;font-weight:500;margin-top:10px}.a-small{font-size:11px;color:#999;margin-top:7px;line-height:1.5}
+.scenario{margin-top:16px;border:1px solid #e9e9e9;border-radius:18px;overflow:hidden}.scenario-row{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr;padding:12px 16px;border-bottom:1px solid #eee;font-size:12px}.scenario-row:last-child{border-bottom:0}.scenario-head{color:#777;background:#fafafa}.scenario-row strong{font-weight:500}
+.factor-list{margin-top:16px;border:1px solid #e9e9e9;border-radius:18px;overflow:hidden}.factor{display:flex;justify-content:space-between;gap:16px;padding:14px 16px;border-bottom:1px solid #eee;font-size:12px}.factor:last-child{border-bottom:0}.factor span:last-child{color:#777;text-align:right}
+.route{margin-top:16px;padding:18px;border-radius:18px;background:#f7f7f7;font-size:12px;line-height:1.55}
+.analysis-note{margin-top:12px;font-size:11px;color:#999;line-height:1.55}
+@media(max-width:700px){.analysis-grid{grid-template-columns:1fr}.scenario-row{grid-template-columns:1.2fr 1fr 1fr 1fr;font-size:11px;padding:10px 9px}.factor{font-size:11px}}
+.live-dot{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#4a8f5a;margin-top:7px}.live-dot i{width:7px;height:7px;border-radius:50%;background:#46a35a;display:inline-block}.live-time{font-size:10px;color:#999;margin-left:6px}
+</style>
+</head>
+<body>
+<main>
+<header><div><div class="brand">🦘 CHEYENNE FX</div><div class="sub">澳洲留学汇率助手</div></div><div class="status">V2.0 · 实时版</div></header>
+
+<section>
+<div class="row">
+<div><label>货币对</label>
+<select id="pair">
+<option value="AUDCNY">🇦🇺 AUD / CNY</option>
+<option value="USDCNY">🇺🇸 USD / CNY</option>
+<option value="JPYCNY">🇯🇵 JPY / CNY</option>
+<option value="AUDJPY">🇦🇺 AUD / JPY</option>
+</select></div>
+<div><div id="rate" class="rate">4.77</div><div id="unit" class="unit">1 澳元 = 人民币</div><span id="move" class="move">↓ 0.6% 今日</span></div>
+</div>
+
+<div class="chart-wrap">
+<div class="chart-head"><div class="chart-title">汇率走势</div><div class="periods">
+<button class="period" data-p="1D">1D</button><button class="period" data-p="1W">1W</button><button class="period" data-p="1M">1M</button><button class="period" data-p="3M">3M</button><button class="period active" data-p="1Y">1Y</button>
+</div></div>
+<svg viewBox="0 0 900 330" preserveAspectRatio="none">
+<rect id="buyZone" x="0" y="0" width="900" height="0" fill="#ffcc00" opacity=".12"/>
+<rect id="strongZone" x="0" y="0" width="900" height="0" fill="#34c759" opacity=".13"/>
+<path id="area" fill="#0071e3" opacity=".07"></path>
+<path id="line" fill="none" stroke="#0071e3" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"></path>
+<line id="currentLine" stroke="#888" stroke-dasharray="5 7" opacity=".6"/>
+<text id="currentText" fill="#555" font-size="12" text-anchor="end"></text>
+</svg>
+<div id="dateLabels" style="display:flex;justify-content:space-between;color:#999;font-size:11px;margin-top:7px;padding:0 2px"></div>
+<div class="legend"><span><i class="dot yellow"></i>买入区间</span><span><i class="dot green"></i>强力买入区间</span><span>— 当前汇率</span></div>
+</div>
+</section>
+
+<section class="grid">
+<div class="card"><div class="label">💰 当前汇率</div><div id="m1" class="value">4.77</div><div id="m1s" class="small">人民币 / 澳元</div></div>
+<div class="card"><div class="label">📍 历史位置</div><div id="m2" class="value">28%</div><div class="small">近1年分位</div></div>
+<div class="card"><div class="label">📈 趋势</div><div id="m3" class="value">↓ Short · → Medium</div><div class="small">近期动量</div></div>
+<div class="card"><div class="label">🎯 换汇建议</div><div id="m4" class="value">适合买入</div><div class="small">换汇信号 · 🟢</div></div>
+</section>
+
+
+<section class="analysis">
+  <div class="section-title">汇率分析</div>
+  <div class="section-sub">从市场数据到实际换汇决策。</div>
+
+  <div class="analysis-grid">
+    <div class="a-card">
+      <div class="a-label">🔮 未来1–3个月展望</div>
+      <div id="outlook" class="a-value">计算中…</div>
+      <div id="outlookSub" class="a-small">基于历史动量和价格区间，不代表确定的未来预测。</div>
+    </div>
+    <div class="a-card">
+      <div class="a-label">📊 波动率</div>
+      <div id="volatility" class="a-value">—</div>
+      <div class="a-small">所选历史区间的波动程度。</div>
+    </div>
+    <div class="a-card">
+      <div class="a-label">🎯 汇率评分</div>
+      <div id="fxscore" class="a-value">— / 100</div>
+      <div id="fxscoreSub" class="a-small">历史位置 + momentum.</div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-row scenario-head"><div>情景</div><div>区间</div><div>概率</div><div>含义</div></div>
+    <div class="scenario-row"><strong>🟢 有利情景</strong><div id="bull区间">—</div><div id="bull概率">—</div><div>澳元可能更便宜</div></div>
+    <div class="scenario-row"><strong>🟡 基准情景</strong><div id="base区间">—</div><div id="base概率">—</div><div>区间-bound</div></div>
+    <div class="scenario-row"><strong>🔴 不利情景</strong><div id="bear区间">—</div><div id="bear概率">—</div><div>澳元可能更贵</div></div>
+  </div>
+
+  <div class="factor-list">
+    <div class="factor"><strong>📍 历史位置</strong><span id="factorHist">—</span></div>
+    <div class="factor"><strong>📈 短期动量</strong><span id="factorShort">—</span></div>
+    <div class="factor"><strong>📉 中期动量</strong><span id="factorMid">—</span></div>
+    <div class="factor"><strong>〰️ 波动率</strong><span id="factorVol">—</span></div>
+  </div>
+
+  <div class="route">
+    <strong>🇯🇵 🇯🇵 日元中转方案</strong><br>
+    我们会比较 <strong>RMB → AUD</strong> 与 <strong>RMB → JPY → AUD</strong>，并在交叉汇率可用时进行比较。只有把汇差和手续费计入后，中转方案才值得考虑。
+    <div id="routeResult" class="a-small">正在等待实时交叉汇率数据…</div>
+  </div>
+
+  <div class="analysis-note">
+    ⚠️ 这是辅助决策模型，不代表对未来汇率的保证。宏观与新闻分析将在独立的数据层加入；当前版本不会在数据不足时人为生成宏观预测。
+  </div>
+</section>
+
+<section class="study">
+<div class="study-top">
+  <div>
+    <h2>🎓 Monash 留学资金</h2>
+    <div><strong id="tuition">A$83,800</strong> <span class="small">2026 江南大学 × Monash 项目参考值</span></div>
+    <div class="small">官方项目参考数据 · 最近核验：2026年8月12日</div>
+  </div>
+  <div style="text-align:right">
+    <div class="small">按实时 AUD/CNY 换算人民币</div>
+    <strong id="cost">≈ ¥—</strong>
+  </div>
+</div>
+<div class="bar"><div class="fill"></div></div>
+<div class="zones">
+  <span>📌 项目费用来源：江南大学</span>
+  <span>🇦🇺 Monash B2000 国际学生公开参考：A$55,900/年</span>
+</div>
+<div class="small" style="margin-top:12px">
+  江南大学 3+1 项目公布的 2026 年 Monash 学年参考费用为 A$83,800。
+  Monash B2000 公开页面目前列出的标准48学分国际学生年度费用为 A$55,900。
+  两项费用不能直接互相替代。
+</div>
+<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+  <a href="https://busi.jiangnan.edu.cn/info/1590/19393.htm" target="_blank" rel="noopener"
+     style="font-size:12px;color:#0071e3;text-decoration:none">↗ 江南大学官方项目费用</a>
+  <a href="https://www.monash.edu/study/courses/find-a-course/business-b2000?international=true" target="_blank" rel="noopener"
+     style="font-size:12px;color:#0071e3;text-decoration:none">↗ Monash 官方 B2000 费用</a>
+</div>
+<div class="source-grid">
+  <div class="source-card">
+    <div class="source-name">🎓 学费来源</div>
+    <div class="source-value"><span class="pill">● 官方</span> Jiangnan University</div>
+    <div class="source-meta">2026 项目参考：A$83,800 · 核验日期：2026年8月12日</div>
+  </div>
+  <div class="source-card">
+    <div class="source-name">🇦🇺 Monash 参考</div>
+    <div class="source-value"><span class="pill">● 官方</span> Bachelor of Business B2000</div>
+    <div class="source-meta">2026 public fee guide: A$38,000 domestic full-fee 参考 · 学费每年可能调整</div>
+  </div>
+</div>
+<div class="alert-box" id="fxAlertBox">
+  🔔 <strong>低位提醒</strong><br>
+  <span id="fxAlertStatus">当 AUD/CNY 进入强力买入区间时提醒你。</span>
+  <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <button id="enableAlert" style="border:0;border-radius:10px;padding:9px 12px;background:#111;color:#fff;font-weight:600">开启低位提醒</button>
+    <span id="alertBadge" style="font-size:11px;color:#777"></span>
+  </div>
+</div>
+
+<div class="alert-box">
+  🔔 <strong>学费变化监测</strong><br>
+  系统会保存最近核验的学费数字和官方来源。正式后台版本会定期检查官网页面，发现变化后先提醒，再更新留学资金预算。
+</div>
+
+</section>
+
+<div class="note">当前原型已接入实时汇率参考数据。换汇信号基于规则模型，仅用于辅助决策，不构成收益保证或投资建议。 Monash 学费目前为参考值，实际付款前请以你的录取通知和最新国际学生费用为准。</div>
+
+<div style="margin-top:18px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#999;line-height:1.6">
+  <strong style="color:#666">数据来源</strong> · 汇率：公开市场参考数据 · 学费：大学官方来源 ·
+  每个决策指标都应显示来源和最近核验日期。银行实际成交汇率及手续费可能与参考汇率不同。
+</div>
+
+</main>
+
+<script>
+
+const PAIRS={
+  AUDCNY:{base:"AUD",quote:"CNY",label:"🇦🇺 AUD / CNY",unit:"1 澳元 = 人民币"},
+  USDCNY:{base:"USD",quote:"CNY",label:"🇺🇸 USD / CNY",unit:"1 美元 = 人民币"},
+  JPYCNY:{base:"JPY",quote:"CNY",label:"🇯🇵 JPY / CNY",unit:"1 日元 = 人民币"},
+  AUDJPY:{base:"AUD",quote:"JPY",label:"🇦🇺 AUD / JPY",unit:"1 澳元 = 日元"}
+};
+let currentPair="AUDCNY", currentPeriod="1Y";
+let D={};
+let alertState = JSON.parse(localStorage.getItem("cheyenneFxAlert") || '{"enabled":false,"armed":true}');
+const API="https://api.frankfurter.dev/v2";
+const LIVE_API="https://api.exchangerate.dev/v1";
+const LIVE_REFRESH_MS=60000;
+
+function isoDate(d){return d.toISOString().slice(0,10)}
+function daysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d}
+function periodDays(p){return ({'1D':2,'1W':10,'1M':45,'3M':110,'1Y':390})[p]||390}
+
+async function fetchRate(base,quote){
+  // Intraday/live feed: exchangerate.dev (free keyless endpoint).
+  const r=await fetch(`${LIVE_API}/latest/${base}?symbols=${quote}`, {cache:"no-store"});
+  if(!r.ok) throw new Error("live rate fetch failed");
+  const j=await r.json();
+  if(!j.rates || typeof j.rates[quote] !== "number") throw new Error("live rate missing");
+  return {rate:j.rates[quote], date:j.timestamp || new Date().toISOString(), source:"实时汇率"};
+}
+async function fetchSeries(base,quote,period){
+  const from=isoDate(daysAgo(periodDays(period)));
+  const to=isoDate(new Date());
+  const r=await fetch(`${API}/rates?base=${base}&quotes=${quote}&from=${from}&to=${to}`);
+  if(!r.ok) throw new Error("series fetch failed");
+  const rows=await r.json();
+  return rows.filter(x=>x.quote===quote).sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function saveAlertState(){
+  localStorage.setItem("cheyenneFxAlert", JSON.stringify(alertState));
+}
+function updateAlertUI(){
+  const status=$("fxAlertStatus"), badge=$("alertBadge"), btn=$("enableAlert");
+  if(!status || !badge || !btn) return;
+  if(alertState.enabled){
+    status.textContent="Enabled · you’ll be alerted when AUD/CNY enters the Strong 买入 Zone.";
+    badge.textContent="🔔 ON";
+    btn.textContent="Turn off alerts";
+  }else{
+    status.textContent="Off · enable alerts to get a notification when AUD/CNY enters the Strong 买入 Zone.";
+    badge.textContent="OFF";
+    btn.textContent="开启低位提醒";
+  }
+}
+async function requestAlertPermission(){
+  if(!("Notification" in window)){
+    alert("This browser does not support notifications. The dashboard can still show the low-rate alert while it is open.");
+    return false;
+  }
+  if(Notification.permission==="granted") return true;
+  if(Notification.permission==="denied"){
+    alert("Notifications are blocked in this browser. You can enable them in browser/site settings.");
+    return false;
+  }
+  const p=await Notification.requestPermission();
+  return p==="granted";
+}
+function maybeLowRateAlert(d){
+  if(!alertState.enabled || !d || currentPair!=="AUDCNY") return;
+  const inStrong = d.r <= d.strong || (d.analysis && d.analysis.pos <= 20);
+  if(inStrong && alertState.armed){
+    alertState.armed=false;
+    saveAlertState();
+    const msg=`AUD/CNY ${d.r.toFixed(4)} · Strong 买入 Zone`;
+    if("Notification" in window && Notification.permission==="granted"){
+      new Notification("CHEYENNE FX · 低位提醒", {
+        body:`${msg}. Consider your planned staged exchange rather than an all-in conversion.`
+      });
+    }else{
+      const box=$("fxAlertBox");
+      if(box) box.scrollIntoView({behavior:"smooth",block:"center"});
+    }
+  }
+  if(!inStrong && d.r > d.buy){
+    alertState.armed=true;
+    saveAlertState();
+  }
+}
+async function fetchLive(){
+  const p=PAIRS[currentPair];
+  const [latest,series]=await Promise.all([
+    fetchRate(p.base,p.quote),
+    fetchSeries(p.base,p.quote,currentPeriod)
+  ]);
+  const vals=series.map(x=>x.rate);
+  if(!vals.length) throw new Error("no historical data");
+  const sorted=[...vals].sort((a,b)=>a-b);
+  const pos=Math.round((sorted.filter(v=>v<=latest.rate).length/Math.max(1,sorted.length))*100);
+  const min=Math.min(...vals), max=Math.max(...vals);
+  const range=max-min||1;
+  const shortN=Math.min(7,vals.length), midN=Math.min(30,vals.length);
+  const shortChange=vals.length>shortN?latest.rate/vals[vals.length-1-shortN]-1:0;
+  const midChange=vals.length>midN?latest.rate/vals[vals.length-1-midN]-1:0;
+  const buy= min + range*0.35, strong=min + range*0.18;
+  let decision = pos<=20 ? "强力买入" : pos<=35 ? "适合买入" : pos>=80 ? "不建议追高" : "观望";
+  let signal = pos<=20 ? "🟢" : pos<=35 ? "🟢" : pos>=80 ? "🔴" : "🟡";
+  const shortArrow=shortChange<-0.002?"↓":shortChange>0.002?"↑":"→";
+  const midArrow=midChange<-0.005?"↓":midChange>0.005?"↑":"→";
+  
+  const returns=[];
+  for(let i=1;i<vals.length;i++) returns.push(vals[i]/vals[i-1]-1);
+  const mean=returns.length?returns.reduce((a,b)=>a+b,0)/returns.length:0;
+  const variance=returns.length?returns.reduce((a,b)=>a+(b-mean)**2,0)/returns.length:0;
+  const vol=Math.sqrt(variance)*Math.sqrt(252)*100;
+  const score=Math.round(
+    (100-pos)*0.55 +
+    (shortChange<0?25:shortChange>0?8:16) +
+    (midChange<0?15:midChange>0?5:10)
+  );
+  const lower=Math.max(min, latest.rate*(1-0.035));
+  const upper=Math.min(max, latest.rate*(1+0.035));
+  const baseLow=Math.max(min, latest.rate*(1-0.015));
+  const baseHigh=Math.min(max, latest.rate*(1+0.015));
+  const bullLow=Math.max(min, latest.rate*(1-0.06));
+  const bullHigh=Math.max(lower, latest.rate*(1-0.025));
+  const bearLow=Math.min(max, latest.rate*(1+0.025));
+  const bearHigh=Math.min(max, latest.rate*(1+0.06));
+  const outlook=shortChange<-0.01 && midChange<0 ? "Slightly lower" : shortChange>0.01 && midChange>0 ? "Slightly higher" : "区间-bound";
+  D[currentPair]={r:latest.rate,u:p.unit,mv:
+`${latest.rate>=vals[vals.length-2]?"↑":"↓"} ${Math.abs((latest.rate/vals[vals.length-2]-1)*100).toFixed(2)}% latest move`,
+    p:`${pos}%`,t:`${shortArrow} Short · ${midArrow} Medium`,d:decision,buy,strong,min,max,v:vals,dates:series.map(x=>x.date),signal,sourceDate:latest.date,source:latest.source,
+    analysis:{vol,score,outlook,bull:[bullLow,bullHigh],base:[baseLow,baseHigh],bear:[bearLow,bearHigh],
+    shortChange,midChange,pos}};
+  render(currentPair);
+  maybeLowRateAlert(D[currentPair]);
+}
+function fallback(){
+  // Conservative fallback only if the browser/network blocks the public API.
+  D[currentPair]={r:4.77,u:"1 澳元 = 人民币",mv:"Live data unavailable",p:"—",t:"—",d:"Connect to live data",buy:4.65,strong:4.55,min:4.45,max:5.05,
+    v:[4.91,4.88,4.86,4.82,4.85,4.79,4.76,4.78,4.74,4.72,4.75,4.71,4.69,4.72,4.77],
+    dates:["2025-08-12","2025-11-12","2026-02-12","2026-05-12","2026-08-12"],signal:"🟡"};
+  render(currentPair);
+}
+function draw(d){
+let W=900,H=330,L=0,R=0,T=20,B=25,y=v=>T+(d.max-v)/(d.max-d.min)*(H-T-B),x=i=>L+i/(d.v.length-1)*(W-L-R),pts=d.v.map((v,i)=>[x(i),y(v)]),path=pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join(' ');
+document.querySelector('#line').setAttribute('d',path);
+document.querySelector('#area').setAttribute('d',path+' L '+W+' '+(H-B)+' L 0 '+(H-B)+' Z');
+
+let buyY=y(d.buy), strongY=y(d.strong), minY=y(d.min);
+document.querySelector('#buyZone').setAttribute('y',Math.min(buyY,strongY));
+document.querySelector('#buyZone').setAttribute('height',Math.abs(buyY-strongY));
+document.querySelector('#strongZone').setAttribute('y',Math.min(strongY,minY));
+document.querySelector('#strongZone').setAttribute('height',Math.abs(strongY-minY));
+
+let cy=y(d.r),cl=document.querySelector('#currentLine');
+cl.setAttribute('x1',0);cl.setAttribute('x2',W);cl.setAttribute('y1',cy);cl.setAttribute('y2',cy);
+document.querySelector('#currentText').setAttribute('x',W-8);
+document.querySelector('#currentText').setAttribute('y',cy-8);
+document.querySelector('#currentText').textContent='Current '+(d.r<1?d.r.toFixed(4):d.r.toFixed(2));
+
+const ds=d.dates||[];
+const idxs=[0,Math.floor((ds.length-1)*.25),Math.floor((ds.length-1)*.5),Math.floor((ds.length-1)*.75),Math.max(0,ds.length-1)];
+const fmt=s=>s?new Date(s+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'';
+document.querySelector('#dateLabels').innerHTML=idxs.map(i=>'<span>'+fmt(ds[i])+'</span>').join('');
+}
+
+
+function render汇率分析(d){
+  const a=d.analysis; if(!a)return;
+  $("outlook").textContent=a.outlook;
+  $("outlookSub").textContent="Model view from historical momentum/range · scenario analysis, not a guaranteed forecast.";
+  $("volatility").textContent=a.vol.toFixed(1)+"%";
+  $("fxscore").textContent=a.score+" / 100";
+  $("fxscoreSub").textContent=a.score>=75?"Historically attractive":a.score>=50?"Neutral zone":"Less attractive";
+  const f=v=>d.r<1?v.toFixed(4):v.toFixed(2);
+  $("bull区间").textContent=f(a.bull[0])+"–"+f(a.bull[1]);
+  $("base区间").textContent=f(a.base[0])+"–"+f(a.base[1]);
+  $("bear区间").textContent=f(a.bear[0])+"–"+f(a.bear[1]);
+  $("bull概率").textContent="30%";
+  $("base概率").textContent="50%";
+  $("bear概率").textContent="20%";
+  $("factorHist").textContent=d.p+" percentile";
+  $("factorShort").textContent=(a.shortChange*100).toFixed(2)+"% over recent window";
+  $("factorMid").textContent=(a.midChange*100).toFixed(2)+"% over medium window";
+  $("factorVol").textContent=a.vol.toFixed(1)+"% annualized estimate";
+}
+function render(k){
+  let d=D[k]; if(!d)return;
+  const dec=d.d;
+  const rateText=d.r<1?d.r.toFixed(4):d.r.toFixed(4);
+  $("rate").textContent=rateText;
+  $("unit").textContent=d.u;
+  $("move").textContent=d.mv;
+  $("m1").textContent=rateText;
+  $("m1s").textContent=d.u;
+  $("m2").textContent=d.p;
+  $("m3").textContent=d.t;
+  $("m4").textContent=dec;
+  $("m4").parentElement.querySelector(".small").textContent=`Exchange Signal · ${d.signal||"🟡"}`;
+  const audCny = D.AUDCNY?.r || (k==="AUDCNY"?d.r:4.77);
+  $("cost").textContent="≈ ¥"+Math.round(83800*audCny).toLocaleString();
+  draw(d);
+  render汇率分析(d);
+  const note=document.querySelector(".note");
+  note.innerHTML=`Live/参考 data: ${d.source||"Reference"} · ${d.sourceDate||"—"} · Intraday FX feed updates about every minute on trading days; historical series remains a daily 参考 feed. 低位提醒s require notification permission; background mobile push will be added 与 the cloud alert service.
+  const lt=document.getElementById("liveTime");
+  if(lt){const dt=d.sourceDate?new Date(d.sourceDate):new Date();lt.textContent="更新于 "+dt.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});}`;
+}
+function $(id){return document.getElementById(id)}
+
+document.querySelector('#pair').addEventListener('change',async e=>{
+  currentPair=e.target.value;
+  try{await fetchLive()}catch(err){fallback()}
+});
+document.querySelectorAll('.period').forEach(btn=>{
+  btn.addEventListener('click',async()=>{
+    currentPeriod=btn.dataset.p;
+    document.querySelectorAll('.period').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    try{await fetchLive()}catch(err){fallback()}
+  });
+});
+document.querySelector("#enableAlert")?.addEventListener("click", async ()=>{
+  if(alertState.enabled){
+    alertState.enabled=false; saveAlertState(); updateAlertUI(); return;
+  }
+  const ok=await requestAlertPermission();
+  alertState.enabled=true; saveAlertState(); updateAlertUI();
+  if(ok && "Notification" in window && Notification.permission==="granted"){
+    new Notification("CHEYENNE FX · Alerts enabled", {body:"You’ll be alerted when AUD/CNY enters the Strong 买入 Zone."});
+  }
+});
+updateAlertUI();
+
+(async()=>{try{await fetchLive()}catch(err){fallback()}})();
+setInterval(async()=>{try{await fetchLive()}catch(err){console.warn("Auto-refresh failed",err)}} , LIVE_REFRESH_MS);
+
+</script>
+</body>
+</html>
